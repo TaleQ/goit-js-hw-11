@@ -1,11 +1,31 @@
 
 .gallery {
+  position: relative;
+  top: 100px;
+  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  width: 1000px;
-  gap: 20px
+  max-width: 1000px;
+  gap: 20px;
 }
 
 .photo-card {
 flex-basis: calc((100% - 60px)/4);
+}
+
+// .photo-card__thumb {
+//   height: 100px;
+// }
+
+.photo-card__link {
+&:hover {
+  cursor: zoom-in;
+}
+}
+
+.load-more {
+  position: relative;
+  top: 100px;
+  margin: 0 auto;
+  padding: 8px;
 }
