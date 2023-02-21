@@ -21,7 +21,6 @@ const lightbox = new SimpleLightbox('.gallery a', {
 
 form.addEventListener('submit', onFormSubmit);
 
-// Slow auto scroll
 // Loading more images
 // Option 1: Using infinite scroll
 window.addEventListener('scroll', throttle(checkPosition, 250));
