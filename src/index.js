@@ -22,8 +22,6 @@ const lightbox = new SimpleLightbox('.gallery a', {
 form.addEventListener('submit', onFormSubmit);
 
 // Slow auto scroll
-// window.addEventListener('scroll', smoothScroll);
-
 // Loading more images
 // Option 1: Using infinite scroll
 window.addEventListener('scroll', throttle(checkPosition, 250));
@@ -31,19 +29,21 @@ window.addEventListener('resize', throttle(checkPosition, 250));
 // Option 2: Using "Load More Btn"
 // loadMoreBtn.addEventListener('click', loadMoreImg);
 
+// Slow auto scroll
+// window.addEventListener('scroll', smoothScroll);
+
 async function onFormSubmit(event) {
   event.preventDefault();
-  window.scrollTo({ top: 0 });
   // hideBtn();
   page = 1;
   let searchQuery = input.value.trim();
-  if (searchQuery === '') {
+  if (!searchQuery) {
     Notify.info('Please, enter a query to search');
     cleanGallery();
     return
   } 
-try {
-    const data = await searchImg(page);
+  try {
+    const data = await searchImg(page, searchQuery);
     const pictures = data.hits;
     pagesAmount = Math.ceil(data.totalHits / 40);
     if (pictures.length === 0) {
@@ -57,6 +57,7 @@ try {
       // }
       const galleryMarkup = createMarkup(pictures);
       gallery.innerHTML = galleryMarkup;
+      window.scrollTo({ top: 0 });
       lightbox.refresh();
       page += 1;
       smoothScroll();
@@ -68,14 +69,18 @@ try {
 
 async function loadMoreImg() {
   try {
+    let searchQuery = input.value.trim();
+    if (!searchQuery || !page) {
+      return
+    }
     // if (page === pagesAmount) {
     //       hideBtn();
     //   }
-    if (page > pagesAmount) {
+    if (page > 1 && page > pagesAmount) {
       Notify.info(
         "We're sorry, but you've reached the end of search results.")
     } else {
-    const data = await searchImg(page);
+    const data = await searchImg(page, searchQuery);
     const pictures = data.hits;
     page += 1;
 const galleryMarkup = createMarkup(pictures);
@@ -88,8 +93,7 @@ const galleryMarkup = createMarkup(pictures);
   }
 }
 
-async function searchImg(page) {
-  let searchQuery = input.value.trim();
+async function searchImg(page, searchQuery) {
   const params = {
     key: '33623115-47a36c1983cc36082c4bb974d',
     q: searchQuery,
@@ -124,7 +128,7 @@ function nothingFound() {
 }
 
 
-// Auxiliary functions
+// Auxilary functions
 function cleanGallery() {
   gallery.innerHTML = '';
 }
@@ -139,14 +143,16 @@ function hideBtn() {
   }
 }
 
-
-// For scroll
-function smoothScroll () {
-  const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
-window.scrollBy({
-  top: cardHeight*2,
-  behavior: "smooth",
-});
+//Functions for scroll
+function smoothScroll() {
+  if (gallery.children.length) {
+const { height: cardHeight } = gallery
+    .firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
+  }
 }
 
 async function checkPosition() {
