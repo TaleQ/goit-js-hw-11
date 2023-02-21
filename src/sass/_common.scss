@@ -12,7 +12,7 @@ body {
 img {
   display: block;
   max-width: 100%;
-  height: auto;
+  max-height: 100%;
   object-fit: cover;
 }
 
@@ -24,10 +24,11 @@ a {
 button {
   display: block;
   border-radius: 4px;
-  background-color: white;
   cursor: pointer;
-
+  border-color: rgba(107,124,139,1);
+  box-shadow:  4px 4px rgba(0, 0, 0, 0.15);
 }
+
 .is-hidden {
   visibility: hidden;
   opacity: 0;
