@@ -10,6 +10,7 @@ const gallery = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
 let page;
+let pagesAmount;
 
 const lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -19,27 +20,32 @@ const lightbox = new SimpleLightbox('.gallery a', {
 });
 
 form.addEventListener('submit', onFormSubmit);
-window.addEventListener('scroll', smoothScroll);
-// Option 1: Using Infinity Scroll
+
+// Slow auto scroll
+// window.addEventListener('scroll', smoothScroll);
+
+// Loading more images
+// Option 1: Using infinite scroll
 window.addEventListener('scroll', throttle(checkPosition, 250));
 window.addEventListener('resize', throttle(checkPosition, 250));
 // Option 2: Using "Load More Btn"
-// loadMoreBtn.addEventListener('click', loadMore);
+// loadMoreBtn.addEventListener('click', loadMoreImg);
 
 async function onFormSubmit(event) {
   event.preventDefault();
   window.scrollTo({ top: 0 });
   // hideBtn();
   page = 1;
-  let searchQuery = event.target[0].value.trim();
+  let searchQuery = input.value.trim();
   if (searchQuery === '') {
     Notify.info('Please, enter a query to search');
-    return clearGallery();
-  }
-  try {
+    cleanGallery();
+    return
+  } 
+try {
     const data = await searchImg(page);
     const pictures = data.hits;
-    const pagesAmount = Math.ceil(data.totalHits / 40);
+    pagesAmount = Math.ceil(data.totalHits / 40);
     if (pictures.length === 0) {
       nothingFound();
     } else {
@@ -52,6 +58,7 @@ async function onFormSubmit(event) {
       const galleryMarkup = createMarkup(pictures);
       gallery.innerHTML = galleryMarkup;
       lightbox.refresh();
+      page += 1;
       smoothScroll();
     }
   } catch (error) {
@@ -59,20 +66,19 @@ async function onFormSubmit(event) {
   }
 }
 
-async function loadMore() {
-  page += 1;
+async function loadMoreImg() {
   try {
-    console.log(page);
+    // if (page === pagesAmount) {
+    //       hideBtn();
+    //   }
+    if (page > pagesAmount) {
+      Notify.info(
+        "We're sorry, but you've reached the end of search results.")
+    } else {
     const data = await searchImg(page);
     const pictures = data.hits;
-    const pagesAmount = Math.ceil(data.totalHits / 40);
-    if (page === pagesAmount) {
-      // hideBtn();
-      Notify.info(
-        "We're sorry, but you've reached the end of search results."
-      );
-    } else {
-      const galleryMarkup = createMarkup(pictures);
+    page += 1;
+const galleryMarkup = createMarkup(pictures);
     gallery.insertAdjacentHTML('beforeend', galleryMarkup);
     lightbox.refresh();
     smoothScroll();
@@ -83,7 +89,7 @@ async function loadMore() {
 }
 
 async function searchImg(page) {
-  searchQuery = input.value.trim();
+  let searchQuery = input.value.trim();
   const params = {
     key: '33623115-47a36c1983cc36082c4bb974d',
     q: searchQuery,
@@ -109,36 +115,36 @@ function createMarkup(pictures) {
 }
 
 function nothingFound() {
+  cleanGallery();
   Notify.failure(
     'Sorry, there are no images matching your search query. Please try again.'
   );
   page = 1;
   // hideBtn();
-  clearGallery();
 }
 
 
 // Auxiliary functions
-function clearGallery() {
+function cleanGallery() {
   gallery.innerHTML = '';
 }
 
-// function makeBtnVisible() {
-//   loadMoreBtn.classList.remove('is-hidden');
-// }
+function makeBtnVisible() {
+  loadMoreBtn.classList.remove('is-hidden');
+}
 
-// function hideBtn() {
-//   if (!loadMoreBtn.classList.contains('is-hidden')) {
-//     loadMoreBtn.classList.add('is-hidden');
-//   }
-// }
+function hideBtn() {
+  if (!loadMoreBtn.classList.contains('is-hidden')) {
+    loadMoreBtn.classList.add('is-hidden');
+  }
+}
 
 
 // For scroll
 function smoothScroll () {
-const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
+  const { height: cardHeight } = gallery.firstElementChild.getBoundingClientRect();
 window.scrollBy({
-  top: cardHeight,
+  top: cardHeight*2,
   behavior: "smooth",
 });
 }
@@ -150,6 +156,6 @@ async function checkPosition() {
   const threshold = height - screenHeight / 4;
   const position = scrolled + screenHeight;
   if (position >= threshold) {
-    await loadMore();
+    await loadMoreImg();
   }
 }
