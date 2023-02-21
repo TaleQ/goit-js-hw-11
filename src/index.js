@@ -90,6 +90,7 @@ const galleryMarkup = createMarkup(pictures);
 
 async function searchImg(page) {
   let searchQuery = input.value.trim();
+  
   const params = {
     key: '33623115-47a36c1983cc36082c4bb974d',
     q: searchQuery,
