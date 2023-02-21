@@ -83,7 +83,7 @@ async function loadMore() {
 }
 
 async function searchImg(page) {
-  searchQuery = input.value.trim();
+  let searchQuery = input.value.trim();
   const params = {
     key: '33623115-47a36c1983cc36082c4bb974d',
     q: searchQuery,
