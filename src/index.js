@@ -79,12 +79,14 @@ async function loadMoreImg() {
       Notify.info(
         "We're sorry, but you've reached the end of search results.")
     } else {
-    const data = await searchImg(page, searchQuery);
+      showLoader();
+      const data = await searchImg(page, searchQuery);
     const pictures = data.hits;
     page += 1;
 const galleryMarkup = createMarkup(pictures);
     gallery.insertAdjacentHTML('beforeend', galleryMarkup);
-    lightbox.refresh();
+      lightbox.refresh();
+      hideLoader();
     smoothScroll();
     }
   } catch (error) {
@@ -117,6 +119,10 @@ function createMarkup(pictures) {
     .join('');
 }
 
+function cleanGallery() {
+  gallery.innerHTML = '';
+}
+
 function nothingFound() {
   cleanGallery();
   Notify.failure(
@@ -126,12 +132,7 @@ function nothingFound() {
   // hideBtn();
 }
 
-
-// Auxilary functions
-function cleanGallery() {
-  gallery.innerHTML = '';
-}
-
+// Functions for "Load More Btn"
 function makeBtnVisible() {
   loadMoreBtn.classList.remove('is-hidden');
 }
@@ -140,6 +141,17 @@ function hideBtn() {
   if (!loadMoreBtn.classList.contains('is-hidden')) {
     loadMoreBtn.classList.add('is-hidden');
   }
+}
+
+// Functions for loader
+function showLoader() {
+  document.querySelector(".backdrop").classList.remove("is-hidden");
+  document.querySelector(".loader").classList.remove("is-hidden");
+}
+
+function hideLoader() {
+  document.querySelector(".backdrop").classList.add("is-hidden");
+  document.querySelector(".loader").classList.add("is-hidden");
 }
 
 //Functions for scroll
